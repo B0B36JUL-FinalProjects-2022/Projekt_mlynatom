@@ -1,5 +1,7 @@
 module Projekt_mlynatom
 
-# Write your package code here.
+include("data_preparation.jl")
+include("nn.jl")
+include("log_reg.jl")
 
 end
