@@ -1,0 +1,7 @@
+name = "Projekt_mlynatom"
+uuid = "a4a59d67-e154-4cd5-bd8c-c80080e10963"
+authors = ["Tomáš Mlynář <mlynatom@fel.cvut.cz>"]
+version = "0.1.0"
+
+[compat]
+julia = "1.8"
