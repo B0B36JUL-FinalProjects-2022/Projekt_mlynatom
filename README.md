@@ -1,1 +1,1 @@
-# Projekt_mlynatom
+# Titanic - Machine Learning from Disaster
