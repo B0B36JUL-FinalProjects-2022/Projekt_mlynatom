@@ -1,4 +1,4 @@
-# Projekt_mlynatom
+# Titanic - Machine Learning from Disaster
 
 ## Description of data from kaggle.com
 ### Data Dictionary
