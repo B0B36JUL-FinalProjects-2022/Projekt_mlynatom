@@ -7,7 +7,7 @@ function read_csv_to_df(file_path::String)
     if ispath(file_path)
         return CSV.read(file_path, DataFrame; header=true)
     else
-        error("file not found")
+        throw(ErrorException("file not found"))
     end
     return
 end
