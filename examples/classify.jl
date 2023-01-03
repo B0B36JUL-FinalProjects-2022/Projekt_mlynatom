@@ -2,14 +2,18 @@ using Revise
 using Projekt_mlynatom
 using DataFrames
 using StatsPlots
+using Plots
+using Flux
+using Flux: crossentropy
+using Statistics
 
 df = read_csv_to_df("data/train.csv")
 
-### View data
-#histogram of siblings
+
+# View data
+### histograms
 @df df histogram(:SibSp, title="Siblings/Spouses")
 
-#histogram of Passenger classes
 @df df histogram(:Pclass, title="Passenger classes")
 
 @df df histogram(:Age, title="Age", legend=false)
@@ -18,44 +22,117 @@ df = read_csv_to_df("data/train.csv")
 
 @df df histogram(:Fare)
 
-### Prepare data
-one_hot_sex = categorical_to_one_hot(df.Sex)
+### Dataframe description
+describe(df)
 
-X = Matrix(df[:, [:Pclass, :SibSp, :Parch]])
-X = hcat(X, one_hot_sex)
 
-y = df.Survived
+# Data augmentation
+## Age
+#idx = findall(.!completecases(df, :Age))
+### fill missing age by mean of ages of other people of same sex and class
+fill_missing_age!(df)
+describe(df)
 
-### Logistic regression
-#X = standardize(X)
+## Embarked
+count_all(df.Embarked)
+### highest occurence has "S"
+fill_missing_embarked!(df, "S")
 
-w = log_reg(X, y)
+describe(df)
 
-preds = predict(X, w)
+
+# Prepare training data
+dummy_cols = [:Sex, :Pclass, :Embarked]
+X_cols = [:Age, :SibSp, :Parch, :Fare]
+X, y = prepare_data(df, dummy_cols, X_cols, :Survived)
+
+# Prepare test data
+df_test = read_csv_to_df("data/test.csv")
+
+describe(df_test)
+
+##1 missing Fare
+findall(.!completecases(df_test, :Fare))
+df_test[153, :] #with missing fare -> Embarked: S, Pclass: 3 -> Fare -> mean
+using Query
+
+sel_fares_df = @from row in dropmissing(df_test, :Fare) begin
+    @where row.Embarked == "S" && row.Pclass == 3
+    @select {
+        row.Fare,
+    }
+    @collect DataFrame
+end
+
+fare_mean = mean(sel_fares_df.Fare)
+
+df_test[153, :Fare] = fare_mean
+describe(df_test)
+
+## missing Age
+fill_missing_age!(df_test)
+describe(df_test)
+
+##Prepare data
+X_test = prepare_data(df_test, dummy_cols, X_cols)
+
+
+
+#Logistic regression
+X_log = hcat(X, ones(size(X, 1)))
+
+w = log_reg(X_log, y, max_iter=1000)
+
+preds = predict(X_log, w)
 
 error = compute_class_error(y, preds)
 
-## on test
 
-df_test = read_csv_to_df("data/test.csv")
-categorical_sex = df_test.Sex
-one_hot_sex = categorical_to_one_hot(categorical_sex)
 
-X = Matrix(df_test[:, [:Pclass, :SibSp, :Parch]])
-X = hcat(X, one_hot_sex)
-
-preds = predict(X, w)
-
-new_df = DataFrame(PassengerId=df_test.PassengerId, Survived=Int8.(preds))
-
-save_df_to_csv(new_df, "data/my_submission.csv")
-
-### NN
+# NN
+#split dataset
 X_train, y_train, X_dev, y_dev = split_dataset(X, y)
 
 #standardize
-X_train_s, X_dev_s = standardize(X_train, X_dev)
+X_train, X_dev = standardize(X_train', X_dev'; dims=2)
+
+y_train = categorical_to_one_hot(y_train)'
+y_dev = categorical_to_one_hot(y_dev)'
+
 
 my_network = Chain(
-    Dense(size())
+    Dense(size(X_train, 1), 50, relu),
+    Dense(50, 50, relu),
+    Dense(50, size(y_train, 1), identity),
+    softmax,
 )
+
+
+L(X, y) = crossentropy(my_network(X), y)
+opt = Adam(0.001)
+max_iter = 600
+acc_test, acc_train, Ls = train_model!(my_network, L, X_train, y_train, X_dev, y_dev; opt=opt, max_iter=max_iter)
+
+plot(acc_test, xlabel="Iteration", ylabel="Dev accuracy", label="", ylim=(-0.01, 1.01))
+plot(acc_train, xlabel="Iteration", ylabel="Train accuracy", label="", ylim=(-0.01, 1.01))
+plot(Ls)
+
+
+accuracy(my_network, X_dev, y_dev; dims=2)
+accuracy(my_network, X_train, y_train; dims=2)
+
+
+
+#evaluate on test data
+## NN
+X_nn_test = standardize(X_test; dims=1)
+
+test_preds = predict(X_nn_test', my_network; dims=2)
+
+## log_reg
+X_log_test = hcat(X_test, ones(size(X_test, 1)))
+
+test_preds = predict(X_log_test, w)
+
+
+save_my_submission(test_preds, df_test.PassengerId)

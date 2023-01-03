@@ -1,7 +1,7 @@
 using CSV
 using DataFrames
 
-export read_csv_to_df, save_df_to_csv, compute_class_error
+export read_csv_to_df, save_my_submission, compute_class_error
 
 function read_csv_to_df(file_path::String)
     if ispath(file_path)
@@ -9,11 +9,18 @@ function read_csv_to_df(file_path::String)
     else
         error("file not found")
     end
-    
+    return
 end
 
 function save_df_to_csv(df::DataFrame, file_path::String)
     CSV.write(file_path, df)
+    return
+end
+
+function save_my_submission(predictions::BitVector, ids::Vector{<:Int}; file_path::String="data/my_submission.csv")
+    new_df = DataFrame(PassengerId=ids, Survived=Int8.(predictions))
+    save_df_to_csv(new_df, file_path)
+    return
 end
 
 function compute_class_error(true_vals::BitVector, predicted_vals::BitVector)
