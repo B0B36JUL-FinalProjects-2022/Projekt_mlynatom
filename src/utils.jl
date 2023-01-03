@@ -17,7 +17,7 @@ function save_df_to_csv(df::DataFrame, file_path::String)
     return
 end
 
-function save_my_submission(predictions::BitVector, ids::Vector{<:Int}; file_path::String="data/my_submission.csv")
+function save_my_submission(predictions, ids::Vector{<:Int}; file_path::String="data/my_submission.csv")
     new_df = DataFrame(PassengerId=ids, Survived=Int8.(predictions))
     save_df_to_csv(new_df, file_path)
     return

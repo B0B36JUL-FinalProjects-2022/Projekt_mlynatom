@@ -101,23 +101,25 @@ y_dev = categorical_to_one_hot(y_dev)'
 
 
 my_network = Chain(
-    Dense(size(X_train, 1), 50, relu),
-    Dense(50, 50, relu),
-    Dense(50, size(y_train, 1), identity),
+    Dense(size(X_train, 1) => 32, relu),
+    Dropout(0.9),
+    Dense(32 => 32, relu),
+    BatchNorm(32),
+    Dropout(0.9),
+    Dense(32 => size(y_train, 1), identity),
     softmax,
 )
 
 
-L(X, y) = crossentropy(my_network(X), y)
+loss(X, y) = crossentropy(my_network(X), y)
 opt = Adam(0.001)
-max_iter = 600
-acc_test, acc_train, Ls = train_model!(my_network, L, X_train, y_train, X_dev, y_dev; opt=opt, max_iter=max_iter)
-
+n_epochs = 1000
+acc_test, acc_train, Ls = train_nn!(my_network, loss, X_train, y_train, X_dev, y_dev; opt=opt, n_epochs=n_epochs, batchsize=8)
 plot(acc_test, xlabel="Iteration", ylabel="Dev accuracy", label="", ylim=(-0.01, 1.01))
-plot(acc_train, xlabel="Iteration", ylabel="Train accuracy", label="", ylim=(-0.01, 1.01))
+plot!(acc_train, xlabel="Iteration", ylabel="Train accuracy", label="", ylim=(-0.01, 1.01))
 plot(Ls)
 
-
+testmode!(my_network)
 accuracy(my_network, X_dev, y_dev; dims=2)
 accuracy(my_network, X_train, y_train; dims=2)
 
