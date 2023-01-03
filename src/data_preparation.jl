@@ -3,7 +3,7 @@ using DataFrames
 using Statistics
 using Random
 
-export categorical_to_one_hot, standardize, split_dataset, one_hot_to_one_cold, fill_missing_age!, fill_missing_embarked!, count_all, prepare_data
+export categorical_to_one_hot, categorical_to_dummy_encoding, standardize, split_dataset, one_hot_to_one_cold, fill_missing_age!, fill_missing_embarked!, count_all, prepare_data
 
 function categorical_to_one_hot(vec)
     unique_vals = unique(vec)
