@@ -40,9 +40,14 @@ fill_missing_embarked!(df, "S")
 
 describe(df)
 
+##titles
+least_occuring_titles = ["Countess.", "Sir.", "Lady.", "Mlle.", "Mme.", "Don.", "Jonkheer.", "Capt.", "Major.", "Dona."]
+add_titles!(df, least_occuring_titles)
+describe(df)
+unique_titles = count_all(df.Titles)
 
 # Prepare training data
-dummy_cols = [:Sex, :Pclass, :Embarked]
+dummy_cols = [:Sex, :Pclass, :Embarked, :Titles]
 X_cols = [:Age, :SibSp, :Parch, :Fare]
 X, y = prepare_data(df, dummy_cols, X_cols, :Survived)
 
@@ -55,17 +60,8 @@ describe(df_test)
 ##1 missing Fare
 findall(.!completecases(df_test, :Fare))
 df_test[153, :] #with missing fare -> Embarked: S, Pclass: 3 -> Fare -> mean
-using Query
 
-sel_fares_df = @from row in dropmissing(df_test, :Fare) begin
-    @where row.Embarked == "S" && row.Pclass == 3
-    @select {
-        row.Fare,
-    }
-    @collect DataFrame
-end
-
-fare_mean = mean(sel_fares_df.Fare)
+fare_mean = compute_fare_mean("S", 3, df_test)
 
 df_test[153, :Fare] = fare_mean
 describe(df_test)
@@ -73,6 +69,12 @@ describe(df_test)
 ## missing Age
 fill_missing_age!(df_test)
 describe(df_test)
+
+## Add Titles
+add_titles!(df_test, least_occuring_titles)
+describe(df_test)
+
+count_all(df_test.Titles)
 
 ##Prepare data
 X_test = prepare_data(df_test, dummy_cols, X_cols)
@@ -88,7 +90,7 @@ X_log_train, y_log_train, X_log_dev, y_log_dev = split_dataset(X_log, y)
 
 best_λ = get_best_λ(X_log_train, y_log_train, X_log_dev, y_log_dev)
 
-w = logistic_regression(X_log, y; max_iter = 100000, λ=best_λ)
+w = logistic_regression(X_log, y; max_iter = 100000, λ=0)
 
 preds = predict(X_log, w)
 
@@ -97,7 +99,7 @@ error = compute_class_error(y, preds)
 
 # NN
 #split dataset
-X_train, y_train, X_dev, y_dev = split_dataset(X, y)
+X_train, y_train, X_dev, y_dev = split_dataset(X, y; dev_ratio=0.1)
 
 #standardize
 X_train, X_dev = standardize(X_train', X_dev'; dims=2)
@@ -108,24 +110,24 @@ y_dev = categorical_to_one_hot(y_dev)'
 
 my_network = Chain(
     Dense(size(X_train, 1) => 32, relu),
-    Dropout(0.9),
+    Dropout(0.5),
     Dense(32 => 32, relu),
     BatchNorm(32),
-    Dropout(0.9),
+    Dropout(0.5),
     Dense(32 => size(y_train, 1), identity),
     softmax,
 )
 
 
 loss(X, y) = crossentropy(my_network(X), y)
-opt = Adam(0.001)
+opt = Adam(0.0001)
 n_epochs = 1000
-acc_test, acc_train, Ls = train_nn!(my_network, loss, X_train, y_train, X_dev, y_dev; opt=opt, n_epochs=n_epochs, batchsize=8)
+acc_test, acc_train, Ls = train_nn!(my_network, loss, X_train, y_train, X_dev, y_dev; opt=opt, n_epochs=n_epochs, batchsize=2)
 plot(acc_test, xlabel="Iteration", ylabel="Dev accuracy", label="", ylim=(-0.01, 1.01))
 plot!(acc_train, xlabel="Iteration", ylabel="Train accuracy", label="", ylim=(-0.01, 1.01))
 plot(Ls)
 
-testmode!(my_network)
+
 accuracy(my_network, X_dev, y_dev; dims=2)
 accuracy(my_network, X_train, y_train; dims=2)
 

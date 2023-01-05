@@ -1023,7 +1023,7 @@ uuid = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
 version = "0.1.4"
 
 [[deps.Projekt_mlynatom]]
-deps = ["BSON", "CSV", "DataFrames", "Flux", "Random", "Statistics"]
+deps = ["BSON", "CSV", "DataFrames", "Flux", "Query", "Random", "Statistics"]
 path = ".."
 uuid = "a4a59d67-e154-4cd5-bd8c-c80080e10963"
 version = "0.1.0"

@@ -2,8 +2,9 @@ using CSV
 using DataFrames
 using Statistics
 using Random
+using Query
 
-export categorical_to_one_hot, categorical_to_dummy_encoding, standardize, split_dataset, one_hot_to_one_cold, fill_missing_age!, fill_missing_embarked!, count_all, prepare_data
+export categorical_to_one_hot, categorical_to_dummy_encoding, standardize, split_dataset, one_hot_to_one_cold, fill_missing_age!, fill_missing_embarked!, count_all, prepare_data, add_titles!, compute_fare_mean
 
 function categorical_to_one_hot(vec)
     unique_vals = unique(vec)
@@ -134,5 +135,27 @@ function prepare_data(df::DataFrame, to_dummy_cols::AbstractVector{Symbol}, X_co
     y = df[:, y_col]
 
     return X, y
+end
+
+function add_titles!(df::DataFrame, least_occuring_titles)
+    matches = match.(r"\w+\.", df.Name)
+    titles = [match.match for match in matches]
+    new_titles = replace(x -> x in least_occuring_titles ? "Rare." : x, titles)
+    df[!, :Titles] = new_titles
+    return
+end
+
+function compute_fare_mean(embarked, pclass, df)
+    sel_fares_df = @from row in dropmissing(df, :Fare) begin
+        @where row.Embarked == embarked && row.Pclass == pclass
+        @select {
+            row.Fare,
+        }
+        @collect DataFrame
+    end
+
+    fare_mean = mean(sel_fares_df.Fare)
+
+    return fare_mean
 end
 
