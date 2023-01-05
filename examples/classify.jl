@@ -95,6 +95,7 @@ w = logistic_regression(X_log, y; max_iter = 100000, λ=0)
 preds = predict(X_log, w)
 
 error = compute_class_error(y, preds)
+accuracy(w, X_log, y)
 
 
 # NN
@@ -110,10 +111,10 @@ y_dev = categorical_to_one_hot(y_dev)'
 
 my_network = Chain(
     Dense(size(X_train, 1) => 32, relu),
-    Dropout(0.5),
+    Dropout(0.2),
     Dense(32 => 32, relu),
     BatchNorm(32),
-    Dropout(0.5),
+    Dropout(0.2),
     Dense(32 => size(y_train, 1), identity),
     softmax,
 )
@@ -122,7 +123,7 @@ my_network = Chain(
 loss(X, y) = crossentropy(my_network(X), y)
 opt = Adam(0.0001)
 n_epochs = 1000
-acc_test, acc_train, Ls = train_nn!(my_network, loss, X_train, y_train, X_dev, y_dev; opt=opt, n_epochs=n_epochs, batchsize=2)
+acc_test, acc_train, Ls = train_nn!(my_network, loss, X_train, y_train, X_dev, y_dev; opt=opt, n_epochs=n_epochs, batchsize=1)
 plot(acc_test, xlabel="Iteration", ylabel="Dev accuracy", label="", ylim=(-0.01, 1.01))
 plot!(acc_train, xlabel="Iteration", ylabel="Train accuracy", label="", ylim=(-0.01, 1.01))
 plot(Ls)
