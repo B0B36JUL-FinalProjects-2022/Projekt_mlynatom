@@ -47,3 +47,16 @@ Child = daughter, son, stepdaughter, stepson
 Some children travelled only with a nanny, therefore parch=0 for them.
 
 ## Usage
+This package focuses on two main parts: Data processing and prediction of survival.
+# Data processing
+In this part (mainly in src/data_preparation.jl) are data processing functions provided.
+Main focus is on processing categorical values, filling missing values and creating new
+data from other.
+
+# Prediction of survival
+<p align="center">
+ <img src="DALL·E 2023-01-05 23.40.19 - titanic passengers in photorealistic version.png" alt="DALLE generated image"/>
+</p>
+
+In this part are implemented 2 options. First is ridge logistic regression and second are neural networks.
+
