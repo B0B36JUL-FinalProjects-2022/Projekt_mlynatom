@@ -26,7 +26,7 @@ df = read_csv_to_df("data/train.csv")
 describe(df)
 
 
-# Data augmentation
+# Data filling
 ## Age
 #idx = findall(.!completecases(df, :Age))
 ### fill missing age by mean of ages of other people of same sex and class
@@ -45,6 +45,7 @@ describe(df)
 dummy_cols = [:Sex, :Pclass, :Embarked]
 X_cols = [:Age, :SibSp, :Parch, :Fare]
 X, y = prepare_data(df, dummy_cols, X_cols, :Survived)
+
 
 # Prepare test data
 df_test = read_csv_to_df("data/test.csv")
@@ -79,14 +80,19 @@ X_test = prepare_data(df_test, dummy_cols, X_cols)
 
 
 #Logistic regression
-X_log = hcat(X, ones(size(X, 1)))
+X_stand = standardize(X; dims=1)
+X_log = hcat(X_stand, ones(size(X, 1)))
 
-w = log_reg(X_log, y, max_iter=1000)
+#split dataset
+X_log_train, y_log_train, X_log_dev, y_log_dev = split_dataset(X_log, y)
+
+best_λ = get_best_λ(X_log_train, y_log_train, X_log_dev, y_log_dev)
+
+w = logistic_regression(X_log, y; max_iter = 100000, λ=best_λ)
 
 preds = predict(X_log, w)
 
 error = compute_class_error(y, preds)
-
 
 
 # NN
@@ -132,7 +138,8 @@ X_nn_test = standardize(X_test; dims=1)
 test_preds = predict(X_nn_test', my_network; dims=2)
 
 ## log_reg
-X_log_test = hcat(X_test, ones(size(X_test, 1)))
+X_test_std = standardize(X_test; dims=1)
+X_log_test = hcat(X_test_std, ones(size(X_test, 1)))
 
 test_preds = predict(X_log_test, w)
 

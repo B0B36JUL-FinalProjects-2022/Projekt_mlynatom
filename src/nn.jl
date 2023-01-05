@@ -4,11 +4,11 @@ using BSON
 
 export train_nn!, predict, accuracy
 
-function train_nn!(nn, loss, X_train, y_train, X_dev, y_dev; opt = Descent(0.1), n_epochs=30, batchsize = 32)
+function train_nn!(nn, loss, X_train, y_train, X_dev, y_dev; opt=Descent(0.1), n_epochs=30, batchsize=32)
     trainmode!(nn) ## according to documentation
     ps = params(nn)
 
-    batches = DataLoader((X_train, y_train); batchsize, shuffle = true)
+    batches = DataLoader((X_train, y_train); batchsize, shuffle=true)
 
     acc_test = zeros(n_epochs)
     acc_train = zeros(n_epochs)
@@ -19,8 +19,8 @@ function train_nn!(nn, loss, X_train, y_train, X_dev, y_dev; opt = Descent(0.1),
         acc_test[i] = accuracy(nn, X_dev, y_dev; dims=2)
         acc_train[i] = accuracy(nn, X_train, y_train; dims=2)
         loss_vec[i] = loss(X_train, y_train)
-    end    
-    
+    end
+
     testmode!(nn)
     return acc_test, acc_train, loss_vec
 end
