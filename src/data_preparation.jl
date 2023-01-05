@@ -33,13 +33,13 @@ function one_hot_to_one_cold(mat; dims=1)
     return ret
 end
 
-function standardize(X::Matrix{<:Number}; dims=1)
+function standardize(X::AbstractMatrix{<:Number}; dims=1)
     col_mean = mean(X; dims=dims)
     col_std = std(X; dims=dims)
     return (X .- col_mean) ./ col_std
 end
 
-function standardize(X_train, X_dev; dims=1)
+function standardize(X_train::AbstractMatrix{<:Number}, X_dev::AbstractMatrix{<:Number}; dims=1)
     col_mean = mean(X_train; dims=dims)
     col_std = std(X_train; dims=dims)
 
