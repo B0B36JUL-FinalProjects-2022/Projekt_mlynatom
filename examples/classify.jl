@@ -135,10 +135,6 @@ accuracy(my_network, X_train, y_train; dims=2)
 
 
 #evaluate on test data
-## NN
-X_nn_test = standardize(X_test; dims=1)
-
-test_preds = predict(X_nn_test', my_network; dims=2)
 
 ## log_reg
 X_test_std = standardize(X_test; dims=1)
@@ -147,4 +143,10 @@ X_log_test = hcat(X_test_std, ones(size(X_test, 1)))
 test_preds = predict(X_log_test, w)
 
 
+## NN
+X_nn_test = standardize(X_test; dims=1)
+
+test_preds = predict(X_nn_test', my_network; dims=2)
+
+##
 save_my_submission(test_preds, df_test.PassengerId)

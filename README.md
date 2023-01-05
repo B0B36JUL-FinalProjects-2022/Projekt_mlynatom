@@ -1,4 +1,19 @@
+<p align="center">
+ <img src="DALL·E 2023-01-05 23.35.01 - titanic disaster.png" alt="DALLE generated image"/>
+</p>
+
 # Titanic - Machine Learning from Disaster
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/B0B36JUL-FinalProjects-2022/Projekt_mlynatom/blob/main/LICENSE)
+
+Projekt_mlynatom package provides data processing of Titanic - Machine Learning from Disaster data and prediction of survival
+by ridge logistic regression and neural networks.
+
+## Installation
+
+The package is not available from official repositories and can be installed with the following command.
+```julia
+(@v1.8) pkg> add https://github.com/B0B36JUL-FinalProjects-2022/Projekt_mlynatom
+```
 
 ## Description of data from kaggle.com
 ### Data Dictionary
@@ -30,3 +45,5 @@ parch: The dataset defines family relations in this way...
 Parent = mother, father
 Child = daughter, son, stepdaughter, stepson
 Some children travelled only with a nanny, therefore parch=0 for them.
+
+## Usage
