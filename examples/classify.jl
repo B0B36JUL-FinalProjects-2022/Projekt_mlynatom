@@ -10,8 +10,8 @@ using Statistics
 df = read_csv_to_df("data/train.csv")
 
 
-# View data
-### histograms
+# View data ###################################################################
+###+ histograms
 @df df histogram(:SibSp, title="Siblings/Spouses")
 
 @df df histogram(:Pclass, title="Passenger classes")
@@ -22,14 +22,14 @@ df = read_csv_to_df("data/train.csv")
 
 @df df histogram(:Fare)
 
-### Dataframe description
+###+ Dataframe description
 describe(df)
+###############################################################################
 
-
-# Data filling
-## Age
+# Missing data filling ########################################################
+##+ Age
 #idx = findall(.!completecases(df, :Age))
-### fill missing age by mean of ages of other people of same sex and class
+###+ fill missing age by mean of ages of other people of same sex and class
 fill_missing_age!(df)
 describe(df)
 
@@ -37,7 +37,6 @@ describe(df)
 count_all(df.Embarked)
 ### highest occurence has "S"
 fill_missing_embarked!(df, "S")
-
 describe(df)
 
 ##titles
@@ -45,16 +44,18 @@ least_occuring_titles = ["Countess.", "Sir.", "Lady.", "Mlle.", "Mme.", "Don.", 
 add_titles!(df, least_occuring_titles)
 describe(df)
 unique_titles = count_all(df.Titles)
+###############################################################################
 
-# Prepare training data
+
+# Prepare training data #######################################################
 dummy_cols = [:Sex, :Pclass, :Embarked, :Titles]
 X_cols = [:Age, :SibSp, :Parch, :Fare]
 X, y = prepare_data(df, dummy_cols, X_cols, :Survived)
+###############################################################################
 
 
-# Prepare test data
+# Prepare test data ###########################################################
 df_test = read_csv_to_df("data/test.csv")
-
 describe(df_test)
 
 ##1 missing Fare
@@ -78,14 +79,14 @@ count_all(df_test.Titles)
 
 ##Prepare data
 X_test = prepare_data(df_test, dummy_cols, X_cols)
+###############################################################################
 
 
-
-#Logistic regression
+# Logistic regression #########################################################
 X_stand = standardize(X; dims=1)
 X_log = hcat(X_stand, ones(size(X, 1)))
 
-#split dataset
+#### split dataset
 X_log_train, y_log_train, X_log_dev, y_log_dev = split_dataset(X_log, y)
 
 best_λ = get_best_λ(X_log_train, y_log_train, X_log_dev, y_log_dev)
@@ -96,18 +97,18 @@ preds = predict(X_log, w)
 
 error = compute_class_error(y, preds)
 accuracy(w, X_log, y)
+###############################################################################
 
 
-# NN
-#split dataset
+# NN ##########################################################################
+### split dataset
 X_train, y_train, X_dev, y_dev = split_dataset(X, y; dev_ratio=0.1)
 
-#standardize
+### standardize
 X_train, X_dev = standardize(X_train', X_dev'; dims=2)
 
 y_train = categorical_to_one_hot(y_train)'
 y_dev = categorical_to_one_hot(y_dev)'
-
 
 my_network = Chain(
     Dense(size(X_train, 1) => 32, relu),
@@ -119,29 +120,28 @@ my_network = Chain(
     softmax,
 )
 
-
 loss(X, y) = crossentropy(my_network(X), y)
 opt = Adam(0.0001)
 n_epochs = 1000
 acc_test, acc_train, Ls = train_nn!(my_network, loss, X_train, y_train, X_dev, y_dev; opt=opt, n_epochs=n_epochs, batchsize=1)
+
+### plot accuracy
 plot(acc_test, xlabel="Iteration", ylabel="Dev accuracy", label="", ylim=(-0.01, 1.01))
 plot!(acc_train, xlabel="Iteration", ylabel="Train accuracy", label="", ylim=(-0.01, 1.01))
 plot(Ls)
 
-
 accuracy(my_network, X_dev, y_dev; dims=2)
 accuracy(my_network, X_train, y_train; dims=2)
+###############################################################################
 
 
-
-#evaluate on test data
+# evaluate on test data #######################################################
 
 ## log_reg
 X_test_std = standardize(X_test; dims=1)
 X_log_test = hcat(X_test_std, ones(size(X_test, 1)))
 
 test_preds = predict(X_log_test, w)
-
 
 ## NN
 X_nn_test = standardize(X_test; dims=1)
@@ -150,3 +150,4 @@ test_preds = predict(X_nn_test', my_network; dims=2)
 
 ##
 save_my_submission(test_preds, df_test.PassengerId)
+###############################################################################
