@@ -1,3 +1,5 @@
+#DEPRECATED -> use classify.ipynb
+
 using Revise
 using Projekt_mlynatom
 using DataFrames
