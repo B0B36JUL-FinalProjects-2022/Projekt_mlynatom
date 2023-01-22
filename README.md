@@ -1,5 +1,5 @@
 <p align="center">
- <img src="DALL·E 2023-01-05 23.35.01 - titanic disaster.png" alt="DALLE generated image"/>
+ <img src="fig/DALL·E 2023-01-05 23.35.01 - titanic disaster.png" alt="DALLE generated image"/>
 </p>
 
 # Titanic - Machine Learning from Disaster
@@ -60,7 +60,7 @@ data from other.
 
 ### Prediction of survival
 <p align="center">
- <img src="DALL·E 2023-01-05 23.40.19 - titanic passengers in photorealistic version.png" alt="DALLE generated image"/>
+ <img src="fig/DALL·E 2023-01-05 23.40.19 - titanic passengers in photorealistic version.png" alt="DALLE generated image"/>
 </p>
 
 In this part are implemented 2 options. First is ridge logistic regression and second are neural networks. 
