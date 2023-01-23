@@ -2,7 +2,7 @@
 
 julia_version = "1.8.1"
 manifest_format = "2.0"
-project_hash = "65bbed7e39b07b214532aa5983558388163ab095"
+project_hash = "61f55d0042d5a8cd349ce9aca0fea54f3fba9fc2"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
@@ -1023,7 +1023,7 @@ uuid = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
 version = "0.1.4"
 
 [[deps.Projekt_mlynatom]]
-deps = ["BSON", "CSV", "CUDA", "DataFrames", "Flux", "Query", "Random", "Statistics"]
+deps = ["BSON", "CSV", "DataFrames", "Flux", "Query", "Random", "Statistics"]
 path = ".."
 uuid = "a4a59d67-e154-4cd5-bd8c-c80080e10963"
 version = "0.1.0"
