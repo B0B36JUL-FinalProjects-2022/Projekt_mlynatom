@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/B0B36JUL-FinalProjects-2022/Projekt_mlynatom/blob/main/LICENSE)
 
 Projekt_mlynatom package provides data processing of Titanic - Machine Learning from Disaster data and prediction of survival
-by ridge logistic regression and neural networks.
+by logistic regression and neural networks.
 
 ## Installation
 
@@ -63,6 +63,7 @@ data from other.
  <img src="fig/DALL·E 2023-01-05 23.40.19 - titanic passengers in photorealistic version.png" alt="DALLE generated image"/>
 </p>
 
-In this part are implemented 2 options. First is ridge logistic regression and second are neural networks. 
+In this part are implemented 2 options. First is ridge logistic regression with normal/adam step and second are neural networks. 
 - Neural networks are trained and defined using [Flux](https://fluxml.ai/Flux.jl/stable/) library with custom training loop.
 - Ridge logistic regression is regularization method used to avoid overfitting.
+- Adam optimization algorithm is used for better (and faster than in normal gradient descent).
