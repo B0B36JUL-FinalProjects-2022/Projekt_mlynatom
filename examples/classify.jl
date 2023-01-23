@@ -1,4 +1,10 @@
-#DEPRECATED -> use classify.ipynb
+##########################################
+#                                        #
+#                                        #
+#    DEPRECATED -> use classify.ipynb    #
+#                                        #
+#                                        #
+##########################################
 
 using Revise
 using Projekt_mlynatom

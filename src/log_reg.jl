@@ -27,7 +27,10 @@ julia> σ(z)
 Predicts values for input matrix `X` given weights `w`.
 """
 function predict(X::AbstractMatrix{<:Number}, w::AbstractVector{<:Number})
-    ##check shapes!
+    if size(w)[1] != size(X)[2]
+        throw(DimensionMismatch)
+    end
+
     probs = σ.(X * w)
     predictions = falses(size(X, 1))
     predictions[probs.>=0.5] .= true
@@ -101,7 +104,10 @@ data matrix `X`, true classes `y`, step structure of parameters `step`,
 initial weights `w` and maximum number of iterations for gradient descent `max_iter`.
 """
 function logistic_regression(X, y, step::Step; λ=0, w=zeros(size(X, 2)), max_iter=10000)
-    #check shapes
+    if size(w)[1] != size(X)[2]
+        throw(DimensionMismatch)
+    end
+
     function grad(w)
         m = size(X, 1)
         y_pred = σ.(X * w)
@@ -122,7 +128,6 @@ trying logistic regression with found parameter on train part of dataset
 dataset (`X_val`, `y_val`).
 """
 function get_best_λ(X_train, y_train, X_val, y_val, step; max_λ=300)
-    #check shapes
     λs = range(0, max_λ, step=0.1)
     best_λ = 0
     best_error = Inf

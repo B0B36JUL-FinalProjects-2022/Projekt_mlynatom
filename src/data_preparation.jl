@@ -42,12 +42,7 @@ julia> categorical_to_dummy_encoding(["a", "b"])
 ```
 """
 function categorical_to_dummy_encoding(vec::AbstractVector)
-    unique_vals = unique(vec)
-    ret_mat = zeros(Bool, (length(vec), length(unique_vals)))
-
-    for i in eachindex(unique_vals)
-        ret_mat[vec.==unique_vals[i], i] .= true
-    end
+    ret_mat = categorical_to_one_hot(vec)
 
     return ret_mat[:, 2:end]
 end
@@ -99,11 +94,12 @@ function standardize(X_train::AbstractMatrix{<:Number}, X_dev::AbstractMatrix{<:
 end
 
 """
-    split_dataset(X, y; dev_ratio=0.1)
+    split_dataset(X, y; dev_ratio=0.1, seed=666)
 
-Splits matrix `X` and vector `y` with ratio of development part `dev_ratio`.
+Splits matrix `X` and vector `y` with ratio of development part `dev_ratio`. The split is performed random usign `seed`
 """
-function split_dataset(X, y; dev_ratio=0.1)
+function split_dataset(X, y; dev_ratio=0.1, seed=666)
+    Random.seed!(seed)
     n = length(y)
     n_dev = round(Int64, dev_ratio * n)
 
@@ -141,7 +137,7 @@ DataFrame `df`.
 function set_missing_age!(df, Sex, Pclass, age)
     class_bit = df[:, :Pclass] .== Pclass
     sex_bit = df[:, :Sex] .== Sex
-    missing_bit = df[:, :Age] .=== missing
+    missing_bit = ismissing.(df[:, :Age])
 
     df[class_bit.&sex_bit.&missing_bit, :Age] .= age
 
